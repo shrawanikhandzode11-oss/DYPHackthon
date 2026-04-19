@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Repo Navigator - Understand Any Codebase Instantly</title>
+<link rel="stylesheet" href="css/styles.css">
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 50%, #fef3f2 100%);
+  color: #1a1a1a;
+  font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* ANIMATED BACKGROUND WITH STARS */
+.animated-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 40%, #fff5f7 100%);
+  z-index: -2;
+  overflow: hidden;
+}
+
+.stars {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: #ff6b35;
+  border-radius: 50%;
+  opacity: 0.3;
+  animation: twinkle 3s infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.15; }
+  50% { opacity: 0.5; }
+}
+
+.bg-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.12;
+}
+
+.orb-1 {
+  width: 800px;
+  height: 800px;
+  background: linear-gradient(135deg, #0066ff, #00d4ff);
+  top: -300px;
+  right: -300px;
+  animation: float 25s ease-in-out infinite;
+}
+
+.orb-2 {
+  width: 600px;
+  height: 600px;
+  background: linear-gradient(135deg, #ff6b35, #ff4500);
+  bottom: -200px;
+  left: -200px;
+  animation: float 30s ease-in-out infinite reverse;
+}
+
+.orb-3 {
+  width: 700px;
+  height: 700px;
+  background: linear-gradient(135deg, #7c3aed, #c084fc);
+  bottom: 50px;
+  right: -150px;
+  animation: float 28s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(50px, -50px) scale(1.05); }
+}
+
+/* NAVBAR */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 50px;
+  position: relative;
+  z-index: 10;
+  backdrop-filter: blur(20px);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 251, 255, 0.8) 100%);
+  border-bottom: 2px solid rgba(0, 102, 255, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 102, 255, 0.08);
+}
+
+.logo {
+  font-size: 28px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #0066ff, #00d4ff, #ff6b35);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: fadeIn 0.6s ease-out;
+}
+
+.nav-right {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+}
+
+.nav-link {
+  color: #333;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 600;
+  transition: all 0.3s;
+  position: relative;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #0066ff, #00d4ff);
+  transition: width 0.3s;
+}
+
+.nav-link:hover {
+  color: #0066ff;
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+/* HERO SECTION */
+.hero {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 90vh;
+  text-align: center;
+  padding: 80px 20px;
+  position: relative;
+  z-index: 5;
+}
+
+.badge {
+  display: inline-block;
+  background: linear-gradient(135deg, rgba(0, 102, 255, 0.15), rgba(255, 107, 53, 0.15));
+  border: 1.5px solid rgba(0, 102, 255, 0.5);
+  color: #0066ff;
+  padding: 10px 24px;
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  margin-bottom: 40px;
+  animation: slideInDown 0.8s ease-out;
+  box-shadow: 0 0 20px rgba(0, 102, 255, 0.25), inset 0 0 20px rgba(0, 102, 255, 0.08);
+  text-transform: uppercase;
+}
+
+h1 {
+  font-size: 88px;
+  font-weight: 900;
+  line-height: 1.1;
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, #0066ff 0%, #00d4ff 25%, #ff6b35 50%, #7c3aed 75%, #0066ff 100%);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: slideInUp 0.9s ease-out 0.1s backwards, gradientShift 6s ease-in-out infinite;
+  letter-spacing: -1px;
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+h1 span {
+  background: linear-gradient(135deg, #00d4ff, #ff6b35, #7c3aed, #00d4ff);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: pulse 4s ease-in-out infinite, gradientShift 4s ease-in-out infinite;
+}
+
+.hero p {
+  font-size: 19px;
+  color: #555;
+  max-width: 700px;
+  margin-bottom: 50px;
+  line-height: 1.8;
+  animation: slideInUp 0.9s ease-out 0.2s backwards;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+/* INPUT BOX ENHANCED */
+.input-box {
+  display: flex;
+  gap: 12px;
+  max-width: 700px;
+  margin-bottom: 80px;
+  animation: slideInUp 0.9s ease-out 0.3s backwards;
+  position: relative;
+}
+
+.input-wrapper {
+  position: relative;
+  flex: 1;
+}
+
+#repoInput {
+  width: 100%;
+  padding: 18px 24px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 251, 255, 0.8));
+  border: 2px solid rgba(0, 102, 255, 0.35);
+  border-radius: 16px;
+  color: #1a1a1a;
+  font-size: 16px;
+  transition: all 0.4s;
+  backdrop-filter: blur(20px);
+  font-weight: 500;
+  box-shadow: 0 8px 32px rgba(0, 102, 255, 0.12), inset 0 0 20px rgba(0, 102, 255, 0.05);
+}
+
+#repoInput::placeholder {
+  color: #999;
+}
+
+#repoInput:focus {
+  outline: none;
+  border-color: #0066ff;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.99), rgba(248, 251, 255, 0.9));
+  box-shadow: 0 0 30px rgba(0, 102, 255, 0.35), inset 0 0 20px rgba(0, 102, 255, 0.1);
+}
+
+/* VALIDATION MESSAGE */
+.validation-msg {
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 8px;
+  padding: 0 16px;
+  min-height: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  opacity: 0;
+  color: #22c55e;
+}
+
+.validation-msg.show {
+  opacity: 1;
+}
+
+.validation-msg.error {
+  color: #ef4444;
+}
+
+.validation-msg.success {
+  color: #22c55e;
+}
+
+.analyze-btn {
+  padding: 18px 48px;
+  background: linear-gradient(135deg, #0066ff, #00d4ff, #ff6b35, #0066ff);
+  background-size: 200% 200%;
+  border: 2px solid transparent;
+  border-radius: 16px;
+  color: #fff;
+  font-weight: 800;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.4s;
+  box-shadow: 0 12px 40px rgba(0, 102, 255, 0.4), 0 0 30px rgba(255, 107, 53, 0.2);
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+  font-weight: 700;
+}
+
+.analyze-btn::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+  transform: rotate(45deg);
+  animation: shine 3s infinite;
+}
+
+@keyframes shine {
+  0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+  100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+}
+
+.analyze-btn:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 50px rgba(0, 102, 255, 0.5), 0 0 40px rgba(255, 107, 53, 0.3);
+  background-position: 100% 0%;
+}
+
+.analyze-btn:active {
+  transform: translateY(-1px);
+}
+
+/* FLOATING PARTICLES */
+.particles {
+  position: absolute;
+  width: 100%;
+  height: 300px;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  opacity: 0.3;
+}
+
+.particle-1 { width: 80px; height: 80px; background: rgba(0, 102, 255, 0.15); border-radius: 50%; top: 20%; left: 10%; animation: float 15s ease-in-out infinite; }
+.particle-2 { width: 120px; height: 120px; background: rgba(255, 107, 53, 0.12); border-radius: 50%; top: 40%; right: 15%; animation: float 20s ease-in-out infinite 2s; }
+.particle-3 { width: 60px; height: 60px; background: rgba(124, 58, 237, 0.15); border-radius: 50%; bottom: 20%; left: 20%; animation: float 18s ease-in-out infinite 4s; }
+
+/* FEATURES SECTION */
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 25px;
+  max-width: 1300px;
+  margin: 0 auto 100px;
+  padding: 100px 20px;
+  position: relative;
+  z-index: 5;
+}
+
+.features::before {
+  content: 'FEATURED CAPABILITIES';
+  position: absolute;
+  top: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 13px;
+  font-weight: 800;
+  color: #0066ff;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.feature-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 251, 255, 0.7));
+  backdrop-filter: blur(20px);
+  padding: 40px;
+  border-radius: 20px;
+  border: 1.5px solid rgba(0, 102, 255, 0.2);
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+  animation: slideInUp 0.8s ease-out;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 102, 255, 0.1), inset 0 0 20px rgba(0, 102, 255, 0.03);
+}
+
+.feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0, 102, 255, 0.3), transparent);
+}
+
+.feature-card:nth-child(1) { animation-delay: 0.15s; }
+.feature-card:nth-child(2) { animation-delay: 0.25s; }
+.feature-card:nth-child(3) { animation-delay: 0.35s; }
+.feature-card:nth-child(4) { animation-delay: 0.15s; }
+.feature-card:nth-child(5) { animation-delay: 0.25s; }
+.feature-card:nth-child(6) { animation-delay: 0.35s; }
+
+.feature-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0, 102, 255, 0.3), transparent);
+}
+
+.feature-card:hover {
+  transform: translateY(-12px) scale(1.02);
+  border-color: rgba(0, 102, 255, 0.4);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(248, 251, 255, 0.85));
+  box-shadow: 0 20px 50px rgba(0, 102, 255, 0.2), 
+              0 0 40px rgba(0, 102, 255, 0.15),
+              inset 0 0 30px rgba(0, 102, 255, 0.08);
+}
+
+.feature-icon {
+  font-size: 50px;
+  margin-bottom: 20px;
+  display: inline-block;
+  animation: bounce 3s ease-in-out infinite;
+}
+
+.feature-card:nth-child(odd) .feature-icon { animation-delay: 0s; }
+.feature-card:nth-child(even) .feature-icon { animation-delay: 0.5s; }
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.feature-card h3 {
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 15px;
+  color: #1a1a1a;
+  background: linear-gradient(135deg, #0066ff, #00d4ff, #ff6b35);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.feature-card p {
+  color: #555;
+  font-size: 15px;
+  line-height: 1.7;
+  font-weight: 500;
+}
+
+/* CTA SECTION */
+.cta-section {
+  text-align: center;
+  padding: 120px 20px;
+  position: relative;
+  z-index: 5;
+  background: linear-gradient(135deg, rgba(0, 102, 255, 0.08), rgba(255, 107, 53, 0.08));
+  border-radius: 30px;
+  margin: 0 20px 80px;
+  border: 1.5px solid rgba(0, 102, 255, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.cta-section h2 {
+  font-size: 56px;
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, #0066ff, #00d4ff, #ff6b35);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 900;
+  animation: slideInUp 0.9s ease-out;
+}
+
+.cta-section p {
+  color: #555;
+  font-size: 18px;
+  margin-bottom: 40px;
+  font-weight: 500;
+}
+
+/* STATS SECTION */
+.stats {
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+  margin-top: 60px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 5;
+  padding: 80px 20px;
+}
+
+.stat {
+  text-align: center;
+  animation: slideInUp 0.9s ease-out;
+}
+
+.stat:nth-child(1) { animation-delay: 0.1s; }
+.stat:nth-child(2) { animation-delay: 0.2s; }
+.stat:nth-child(3) { animation-delay: 0.3s; }
+
+.stat-number {
+  font-size: 48px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #0066ff, #00d4ff, #ff6b35);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 10px;
+}
+
+.stat-label {
+  color: #555;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* FOOTER */
+.footer {
+  text-align: center;
+  padding: 50px 20px;
+  border-top: 1px solid rgba(0, 102, 255, 0.2);
+  color: #777;
+  font-size: 15px;
+  position: relative;
+  z-index: 5;
+  font-weight: 500;
+}
+
+/* ANIMATIONS */
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; filter: drop-shadow(0 0 0px rgba(34, 197, 94, 0.5)); }
+  50% { opacity: 0.8; filter: drop-shadow(0 0 20px rgba(34, 197, 94, 0.8)); }
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 56px;
+  }
+
+  .navbar {
+    padding: 15px 20px;
+  }
+
+  .hero {
+    min-height: 100vh;
+    padding: 60px 20px;
+  }
+
+  .input-box {
+    flex-direction: column;
+    max-width: 100%;
+  }
+
+  .features {
+    grid-template-columns: 1fr;
+    padding: 80px 20px;
+  }
+
+  .stats {
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  .cta-section {
+    padding: 80px 20px;
+  }
+
+  .cta-section h2 {
+    font-size: 40px;
+  }
+}
+</style>
+</head>
+
+<body>
+<div class="animated-bg">
+  <div class="stars" id="starContainer"></div>
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-orb orb-3"></div>
+</div>
+
+<header class="navbar">
+  <div class="logo">🟢 Repo Navigator</div>
+  <div class="nav-right">
+    <a href="#features" class="nav-link">Features</a>
+    <a href="#stats" class="nav-link">Impact</a>
+    <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="nav-link">GitHub</a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="particles">
+    <div class="particle particle-1"></div>
+    <div class="particle particle-2"></div>
+    <div class="particle particle-3"></div>
+  </div>
+
+  <div class="badge">✨ INSTANT CODE ANALYSIS</div>
+  
+  <h1>
+    Understand Your<br>
+    <span>Code Instantly</span>
+  </h1>
+  
+  <p>
+    Transform any GitHub repository into an interactive architecture graph.<br>
+    Get instant dependency analysis, risk assessment, and intelligent onboarding paths.
+  </p>
+  
+  <div class="input-box">
+    <div class="input-wrapper">
+      <input id="repoInput" type="text" placeholder="https://github.com/facebook/react">
+      <div id="validationMsg" class="validation-msg"></div>
+    </div>
+    <div class="input-wrapper" style="max-width: 300px;">
+      <input id="githubTokenInput" type="password" placeholder="GitHub Token (optional for private repos)" style="width: 100%; padding: 18px 24px; background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 251, 255, 0.8)); border: 2px solid rgba(0, 102, 255, 0.35); border-radius: 16px; color: #1a1a1a; font-size: 14px; transition: all 0.4s; backdrop-filter: blur(20px); font-weight: 500; box-shadow: 0 8px 32px rgba(0, 102, 255, 0.12), inset 0 0 20px rgba(0, 102, 255, 0.05);">
+    </div>
+    <button class="analyze-btn" onclick="goToDashboard()">Analyze Repository →</button>
+  </div>
+</section>
+
+<section class="features" id="features">
+  <div class="feature-card">
+    <div class="feature-icon">🏗️</div>
+    <h3>Architecture Graph</h3>
+    <p>Visualize your codebase with interactive D3.js force-directed graphs. See all dependencies and relationships at a glance.</p>
+  </div>
+  
+  <div class="feature-card">
+    <div class="feature-icon">⚠️</div>
+    <h3>Risk Analysis</h3>
+    <p>Automatically identify high-risk files, critical dependencies, and potential architectural bottlenecks in seconds.</p>
+  </div>
+  
+  <div class="feature-card">
+    <div class="feature-icon">🚀</div>
+    <h3>Quick Onboarding</h3>
+    <p>Get an intelligent learning path sorted by importance. Understand complex codebases faster than ever.</p>
+  </div>
+  
+  <div class="feature-card">
+    <div class="feature-icon">🔍</div>
+    <h3>Smart Filtering</h3>
+    <p>Filter by file type, search across modules instantly. Focus on specific architectural layers with one click.</p>
+  </div>
+  
+  <div class="feature-card">
+    <div class="feature-icon">📊</div>
+    <h3>Dependency Mapping</h3>
+    <p>Understand import relationships deeply. Detect circular dependencies and optimize module boundaries effortlessly.</p>
+  </div>
+  
+  <div class="feature-card">
+    <div class="feature-icon">🎯</div>
+    <h3>Detailed Insights</h3>
+    <p>Click any node to view metrics, risk levels, dependencies count, and contextual information.</p>
+  </div>
+</section>
+
+<section class="stats" id="stats">
+  <div class="stat">
+    <div class="stat-number">100K+</div>
+    <div class="stat-label">Analyses Performed</div>
+  </div>
+  <div class="stat">
+    <div class="stat-number">50+</div>
+    <div class="stat-label">Languages Supported</div>
+  </div>
+  <div class="stat">
+    <div class="stat-number">2sec</div>
+    <div class="stat-label">Average Analysis Time</div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <h2>Ready to Explore Your Code?</h2>
+  <p>Get instant insights into any public GitHub repository</p>
+  <button class="analyze-btn" onclick="focusInput()" style="margin-top: 20px;">Get Started Now →</button>
+</section>
+
+<footer class="footer">
+  <p> Repo Navigator | Understanding Codebases Faster | Built for Modern Developers</p>
+</footer>
+
+<script>
+// Generate random stars
+function generateStars() {
+  const container = document.getElementById('starContainer');
+  for (let i = 0; i < 100; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    star.style.left = Math.random() * 100 + '%';
+    star.style.top = Math.random() * 100 + '%';
+    star.style.animationDelay = Math.random() * 3 + 's';
+    container.appendChild(star);
+  }
+}
+
+generateStars();
+
+// REAL-TIME VALIDATION
+function validateGitHubURL(url) {
+  if (!url) return { valid: false, message: '' };
+  
+  if (!url.includes('github.com')) {
+    return { valid: false, message: ' Invalid URL - must include github.com' };
+  }
+  
+  const parts = url.replace("https://github.com/", "").replace("github.com/", "").split("/");
+  
+  if (parts.length < 2 || !parts[0] || !parts[1]) {
+    return { valid: false, message: ' Incomplete URL - format: https://github.com/user/repo' };
+  }
+  
+  return { valid: true, message: ' Correct - Ready to analyze!' };
+}
+
+const repoInput = document.getElementById("repoInput");
+const validationMsg = document.getElementById("validationMsg");
+
+repoInput.addEventListener("input", function() {
+  const result = validateGitHubURL(this.value.trim());
+  
+  if (!this.value.trim()) {
+    validationMsg.textContent = '';
+    validationMsg.classList.remove('show', 'error', 'success');
+  } else if (result.valid) {
+    validationMsg.textContent = result.message;
+    validationMsg.classList.add('show', 'success');
+    validationMsg.classList.remove('error');
+  } else {
+    validationMsg.textContent = result.message;
+    validationMsg.classList.add('show', 'error');
+    validationMsg.classList.remove('success');
+  }
+});
+
+function goToDashboard(){
+  const url = document.getElementById("repoInput").value.trim();
+  const githubToken = document.getElementById("githubTokenInput").value.trim();
+  
+  if (!url) {
+    alert('Please enter a GitHub repository URL');
+    return;
+  }
+  
+  if (!url.includes('github.com')) {
+    alert('Please enter a valid GitHub URL (e.g., https://github.com/user/repo)');
+    return;
+  }
+  
+  // Extract owner/repo from URL
+  const parts = url.replace("https://github.com/", "").replace("github.com/", "").split("/");
+  if (parts.length < 2 || !parts[0] || !parts[1]) {
+    alert('Please provide a complete repository URL: https://github.com/username/repositoryname');
+    return;
+  }
+  
+  // Store both the URL (for auto-analysis) and display name
+  localStorage.setItem("repoUrl", url);
+  const repoName = url.split("/").slice(-2).join(" / ");
+  localStorage.setItem("repo", repoName);
+  
+  // Store GitHub token if provided
+  if (githubToken) {
+    localStorage.setItem("githubToken", githubToken);
+  }
+  
+  window.location.href = "dashboard.html";
+}
+
+function focusInput(){
+  document.getElementById("repoInput").focus();
+  document.getElementById("repoInput").scrollIntoView({ behavior: 'smooth' });
+}
+
+// Handle Enter key
+document.getElementById("repoInput").addEventListener("keypress", function(event) {
+  if (event.key === "Enter") {
+    goToDashboard();
+  }
+});
+
+// Smooth scroll for nav links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function (e) {
+    e.preventDefault();
+    const target = document.querySelector(this.getAttribute('href'));
+    if (target) {
+      target.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  });
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard - Repo Navigator</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    body.dark { background: linear-gradient(135deg, #ffffff 0%, #f8fbff 50%, #fef3f2 100%); }
+    
+    .navbar { 
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 251, 255, 0.8) 100%); 
+      border-bottom: 2px solid rgba(0, 102, 255, 0.15); 
+    }
+    
+    .navbar > div:first-child { 
+      color: #0066ff; 
+      font-size: 20px; 
+      font-weight: bold; 
+    }
+    
+    #repoName { color: #555; font-size: 16px; font-weight: 600; }
+    
+    #settingsBtn { 
+      background: linear-gradient(135deg, #0066ff, #00d4ff) !important; 
+      color: white !important; 
+      border: none !important;
+      padding: 8px 16px !important;
+      border-radius: 8px !important;
+      cursor: pointer !important;
+      font-weight: 600 !important;
+    }
+    
+    #resetViewBtn {
+      background: #ffffff !important;
+      color: #0066ff !important;
+      border: 2px solid rgba(0, 102, 255, 0.25) !important;
+      padding: 8px 16px !important;
+      border-radius: 8px !important;
+      cursor: pointer !important;
+      font-weight: 700 !important;
+    }
+
+    #resetViewBtn:hover {
+      background: rgba(0, 102, 255, 0.08) !important;
+      transform: translateY(-2px);
+    }
+
+    #settingsBtn:hover { 
+      background: linear-gradient(135deg, #0052cc, #0099ff) !important; 
+      transform: translateY(-2px);
+    }
+    
+    #repoModal > div { 
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(248, 251, 255, 0.95)) !important; 
+      border: 2px solid rgba(0, 102, 255, 0.3) !important;
+      border-radius: 12px !important;
+      box-shadow: 0 8px 32px rgba(0, 102, 255, 0.15) !important;
+    }
+    
+    #repoModal h2 { color: #0066ff; margin-bottom: 10px; }
+    
+    #repoModal p { color: #555; margin-bottom: 15px; }
+    
+    #repoUrl, #githubToken { 
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 251, 255, 0.8)) !important;
+      border: 2px solid rgba(0, 102, 255, 0.25) !important;
+      color: #1a1a1a !important;
+      padding: 12px !important;
+      font-family: 'Poppins', sans-serif !important;
+      font-size: 14px !important;
+      border-radius: 8px !important;
+    }
+    
+    #repoUrl::placeholder, #githubToken::placeholder { color: #999 !important; }
+    
+    #repoUrl:focus, #githubToken:focus { 
+      outline: none !important;
+      border-color: #0066ff !important; 
+      box-shadow: 0 0 20px rgba(0, 102, 255, 0.3) !important; 
+    }
+    
+    #analyzeBtn { 
+      background: linear-gradient(135deg, #0066ff, #00d4ff) !important;
+      color: white !important;
+      border: none !important;
+      padding: 12px !important;
+      border-radius: 8px !important;
+      cursor: pointer !important;
+      font-weight: 600 !important;
+      transition: all 0.3s !important;
+    }
+    
+    #analyzeBtn:hover { 
+      background: linear-gradient(135deg, #0052cc, #0099ff) !important;
+    }
+    
+    #closeModal { 
+      background: #ccc !important; 
+      color: #1a1a1a !important;
+      border: none !important;
+      padding: 12px !important;
+      border-radius: 8px !important;
+      cursor: pointer !important;
+      font-weight: 600 !important;
+    }
+    
+    #closeModal:hover { 
+      background: #999 !important; 
+    }
+    
+    #statusMsg { 
+      color: #fbbf24 !important;
+      font-size: 14px !important;
+      font-weight: 600 !important;
+    }
+    
+    #statusMsg.success { color: #22c55e !important; }
+    #statusMsg.error { color: #ef4444 !important; }
+
+    .graph-loader {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15, 23, 42, 0.88);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      z-index: 10;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .graph-loader.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .graph-empty {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #94a3b8;
+      font-size: 16px;
+      font-weight: 600;
+      z-index: 1;
+    }
+
+    .graph-controls {
+      position: absolute;
+      top: 18px;
+      left: 18px;
+      display: flex;
+      gap: 8px;
+      z-index: 5;
+      background: rgba(255, 255, 255, 0.92);
+      border-radius: 14px;
+      padding: 8px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    .graph-controls button {
+      appearance: none;
+      border: none;
+      background: #ffffff;
+      color: #1f2937;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12);
+      transition: transform 0.24s ease, background 0.24s ease, box-shadow 0.24s ease;
+    }
+
+    .graph-controls button:hover {
+      transform: translateY(-1px);
+      background: #eef2ff;
+      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.16);
+    }
+
+    .minimap {
+      position: absolute;
+      right: 18px;
+      bottom: 18px;
+      width: 170px;
+      height: 130px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.92);
+      box-shadow: 0 12px 26px rgba(0, 0, 0, 0.12);
+      padding: 10px;
+      overflow: hidden;
+      z-index: 5;
+    }
+
+    .minimap svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .insight-card {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    }
+
+    .insight-card h4 {
+      margin-bottom: 10px;
+      font-size: 15px;
+      color: #0f172a;
+    }
+
+    #insights ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+      max-height: 140px;
+      overflow-y: auto;
+    }
+
+    #insights li {
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+      color: #334155;
+      font-size: 14px;
+    }
+
+    #insights li:last-child {
+      border-bottom: none;
+    }
+
+    .node-group circle.high-risk {
+      filter: drop-shadow(0 0 22px rgba(239, 68, 68, 0.65));
+    }
+
+    .node-group {
+      transition: opacity 0.25s ease;
+    }
+
+    #graph {
+      position: relative;
+      min-height: 580px;
+    }
+
+    #graphTooltip {
+      pointer-events: none;
+    }
+
+    .query-box {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .query-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    #nlQuery {
+      flex: 1;
+    }
+
+    #runQueryBtn {
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #0066ff, #00a3ff);
+      color: #fff;
+      padding: 10px 12px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    #runQueryBtn:hover {
+      transform: translateY(-1px);
+    }
+
+    #clearQueryBtn {
+      border: 1px solid rgba(0, 102, 255, 0.3);
+      border-radius: 8px;
+      background: #fff;
+      color: #0066ff;
+      padding: 10px 12px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    #queryResult {
+      color: #334155;
+      font-size: 13px;
+      line-height: 1.5;
+      min-height: 34px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      background: rgba(0, 102, 255, 0.06);
+    }
+  </style>
+</head>
+
+<body class="dark">
+
+<header class="navbar">
+  <div>🟢 Repo Navigator</div>
+  <div id="repoName" style="flex: 1; text-align: center;"></div>
+  <button id="resetViewBtn" style="padding: 8px 16px; cursor: pointer; border: none; border-radius: 4px; font-weight: bold; margin-right: 10px;">↻ Reset View</button>
+  <button id="settingsBtn" style="padding: 8px 16px; cursor: pointer; border: none; border-radius: 4px; font-weight: bold;">⚙ Settings</button>
+</header>
+
+<!-- REPO INPUT MODAL -->
+<div id="repoModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center;">
+  <div style="padding: 30px; border-radius: 12px; width: 90%; max-width: 500px; border: 2px solid;">
+    <h2 style="margin-top: 0;">Analyze Repository</h2>
+    <p>Enter a GitHub repository URL to analyze its structure:</p>
+    
+    <div style="margin: 20px 0;">
+      <input id="repoUrl" type="text" placeholder="https://github.com/facebook/react" 
+             style="width: 100%; padding: 12px; border: 2px; border-radius: 8px; box-sizing: border-box; font-size: 14px;">
+    </div>
+    <div style="margin: 12px 0 20px;">
+      <input id="githubToken" type="password" placeholder="Optional: GitHub token for live analysis (ghp_...)" 
+             style="width: 100%; padding: 12px; border: 2px; border-radius: 8px; box-sizing: border-box; font-size: 14px;">
+      <p style="font-size: 12px; margin-top: 6px;">Tip: add a GitHub token to avoid API rate limits.</p>
+    </div>
+
+    <div id="statusMsg" style="margin: 15px 0; font-size: 14px; min-height: 20px;"></div>
+
+    <div style="display: flex; gap: 10px;">
+      <button id="analyzeBtn" style="flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px;">📊 Analyze</button>
+      <button id="closeModal" style="flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; color: #fff;">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <span>Files: <b id="files"></b></span>
+  <span>Deps: <b id="deps"></b></span>
+  <span class="risk">High Risk: <b id="risk"></b></span>
+  <span>Entries: <b id="entries"></b></span>
+</div>
+
+<div class="layout">
+
+  <!-- LEFT -->
+  <aside class="left">
+    <h3>Layer Filter</h3>
+    <ul id="filters">
+      <li data-type="all">All</li>
+      <li data-type="entry">Entry Points</li>
+      <li data-type="service">Services</li>
+      <li data-type="util">Utilities</li>
+      <li data-type="external">External</li>
+      <li data-type="config">Config</li>
+      <li data-type="test">Tests</li>
+    </ul>
+
+    <h3>Search</h3>
+    <input id="search" placeholder="Search file...">
+
+    <h3>Natural Language Query</h3>
+    <div class="query-box">
+      <div class="query-row">
+        <input id="nlQuery" placeholder="where is authentication handled?">
+      </div>
+      <div class="query-row">
+        <button id="runQueryBtn">Highlight Flow</button>
+        <button id="clearQueryBtn">Clear</button>
+      </div>
+      <div id="queryResult">Ask about auth, API flow, database, config, tests, or services.</div>
+    </div>
+
+    <h3>Onboarding Path</h3>
+    <ul id="onboarding"></ul>
+  </aside>
+
+  <!-- GRAPH -->
+  <main id="graph"></main>
+
+  <!-- RIGHT -->
+  <aside class="right">
+    <h3>Details</h3>
+    <div id="details">Click a node</div>
+
+    <h3 style="margin-top: 28px;">Insights</h3>
+    <div id="insights">
+      <div class="insight-card">
+        <h4>Most Connected</h4>
+        <ul id="mostConnected"></ul>
+      </div>
+      <div class="insight-card">
+        <h4>High Risk</h4>
+        <ul id="highRisk"></ul>
+      </div>
+      <div class="insight-card">
+        <h4>Potential Unused</h4>
+        <ul id="unusedFiles"></ul>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
